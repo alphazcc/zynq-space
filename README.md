@@ -9,6 +9,6 @@
 
 ## 目录
 
-- SDK 这里记录 PS 端内容
-- FPGA 这里记录 PL 端内容
-- Linux 这里记录 Linux 内容
+- SDK 这里记录 嵌入式 SDK 开发内容
+- FPGA 这里记录 FPGA 开发内容
+- Linux 这里记录 Linux 开发内容
