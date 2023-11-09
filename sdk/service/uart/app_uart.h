@@ -32,6 +32,6 @@ uart_msg_t g_uart0_msg;
 int app_uart_init(void);
 int uart_msg_print(void);
 int uart_lookback_test(void);
-int uart_report(uint8_t dev, uint8_t err);
 
 #endif
+

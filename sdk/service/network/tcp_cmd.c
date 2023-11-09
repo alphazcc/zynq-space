@@ -87,15 +87,15 @@ int tcp_test_cmd(void)
 }
 #endif
 
-int tcp_func_per_500ms(void)
-{
-    tcp_slowtmr();
-    return 0;
-}
-
 int tcp_func_per_250ms(void)
 {
     tcp_fasttmr();
+    return 0;
+}
+
+int tcp_func_per_500ms(void)
+{
+    tcp_slowtmr();
     return 0;
 }
 

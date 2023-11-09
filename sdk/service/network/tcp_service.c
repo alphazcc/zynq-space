@@ -49,10 +49,12 @@ err_t tcp_transfer_data(struct tcp_pcb *tpcb, const uint8_t *pData, int plen)
             return ERR_BUF;
         }
     }
+
     /* copy data to pbuf payload */
     memcpy(tcp_pbuf->payload, pData, plen);
     tcp_pbuf->len = plen;
     tcp_pbuf->tot_len = plen;
+
     /* Start to send udp data */
     err = tcp_write(tpcb, (tcp_pbuf->payload), (tcp_pbuf->len), 
                         TCP_WRITE_FLAG_COPY | TCP_WRITE_FLAG_MORE);
@@ -61,12 +63,14 @@ err_t tcp_transfer_data(struct tcp_pcb *tpcb, const uint8_t *pData, int plen)
         ULOG("Error on tcp_write: %d!\r\n", err);
         return err;
     }
+
     err = tcp_output(tpcb);
     if (err != ERR_OK)
     {
         ULOG("Error on tcp_output: %d!\r\n", err);
         return err;
     }
+
     return err;
 }
 
@@ -106,6 +110,7 @@ err_t tcp_send(tcp_node_t *tcp_node, tcp_msg_t *tcp_msg)
                     (uint8_t *)tcp_msg->tx_pdata, tcp_msg->tx_plen);
         tcp_msg->tx_vflag = 0;
     }
+
     return err;
 }
 
@@ -144,6 +149,7 @@ static int tcp_connection_close(struct tcp_pcb *tpcb)
         }
     }
 #endif
+
     return ERR_OK;
 }
 
