@@ -14,8 +14,8 @@
 #define SPI_MISO_PIN            56
 #define SPI_NSS_PIN             57
 
-#define GPIO_MODEL_INPUT        0
-#define GPIO_MODEL_OUTPUT       1
+#define GPIO_MODE_INPUT         0
+#define GPIO_MODE_OUTPUT        1
 
 #define GPIO_OUTPUT_DISABLE     0
 #define GPIO_OUTPUT_ENABLE      1

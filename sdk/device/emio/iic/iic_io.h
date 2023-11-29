@@ -12,8 +12,8 @@
 #define SCL_PIN           54
 #define SDA_PIN           55
 
-#define GPIO_MODEL_INPUT        0
-#define GPIO_MODEL_OUTPUT       1
+#define GPIO_MODE_INPUT         0
+#define GPIO_MODE_OUTPUT        1
 
 #define GPIO_OUTPUT_DISABLE     0
 #define GPIO_OUTPUT_ENABLE      1

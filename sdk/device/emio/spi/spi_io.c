@@ -10,7 +10,7 @@ extern XGpioPs GpioPs;
 
 static void SET_PIN_OUT(uint32_t PIN)
 {
-    XGpioPs_SetDirectionPin(&GpioPs, PIN, GPIO_MODEL_OUTPUT);
+    XGpioPs_SetDirectionPin(&GpioPs, PIN, GPIO_MODE_OUTPUT);
     XGpioPs_SetOutputEnablePin(&GpioPs, PIN, GPIO_OUTPUT_ENABLE);
 }
 
@@ -37,7 +37,7 @@ void SCK_L(void)
 }
 uint32_t MISO(void)
 {
-    XGpioPs_SetDirectionPin(&GpioPs, SPI_MISO_PIN, GPIO_MODEL_INPUT);
+    XGpioPs_SetDirectionPin(&GpioPs, SPI_MISO_PIN, GPIO_MODE_INPUT);
     return XGpioPs_ReadPin(&GpioPs, SPI_MISO_PIN);
 }
 void NSS_H(void)

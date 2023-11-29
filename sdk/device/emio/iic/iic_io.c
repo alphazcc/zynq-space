@@ -10,7 +10,7 @@ extern XGpioPs GpioPs;
 
 void SCL_OUT(void)
 {
-    XGpioPs_SetDirectionPin(&GpioPs, SCL_PIN, GPIO_MODEL_OUTPUT);
+    XGpioPs_SetDirectionPin(&GpioPs, SCL_PIN, GPIO_MODE_OUTPUT);
     XGpioPs_SetOutputEnablePin(&GpioPs, SCL_PIN, GPIO_OUTPUT_ENABLE);
 }
 
@@ -26,7 +26,7 @@ void SCL_LOW(void)
 
 void SDA_IN(void)
 {
-    XGpioPs_SetDirectionPin(&GpioPs, SDA_PIN, GPIO_MODEL_INPUT);
+    XGpioPs_SetDirectionPin(&GpioPs, SDA_PIN, GPIO_MODE_INPUT);
 }
 
 uint32_t SDA_READ(void)
@@ -36,7 +36,7 @@ uint32_t SDA_READ(void)
 
 void SDA_OUT(void)
 {
-    XGpioPs_SetDirectionPin(&GpioPs, SDA_PIN, GPIO_MODEL_OUTPUT);
+    XGpioPs_SetDirectionPin(&GpioPs, SDA_PIN, GPIO_MODE_OUTPUT);
     XGpioPs_SetOutputEnablePin(&GpioPs, SDA_PIN, GPIO_OUTPUT_ENABLE);
 }
 
