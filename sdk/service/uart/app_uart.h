@@ -9,6 +9,8 @@
 
 #include "uart.h"
 
+#ifdef USING_UART
+
 /* maximum receiver length */
 #define UART_MSG_MAX_LEN    100
 
@@ -25,13 +27,19 @@ struct uart_msg
 
 typedef struct uart_msg uart_msg_t;
 
+#ifdef USING_UART0
 XUartPs Uart0_Ps;
-
 uart_msg_t g_uart0_msg;
+#endif
+
+#ifdef USING_UART1
+XUartPs Uart1_Ps;
+uart_msg_t g_uart1_msg;
+#endif
 
 int app_uart_init(void);
 int uart_msg_print(void);
 int uart_lookback_test(void);
 
 #endif
-
+#endif

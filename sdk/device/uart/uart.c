@@ -6,15 +6,17 @@
  */
 #include "uart.h"
 
+#ifdef USING_UART
+
 /**
- * @brief 串口初始化
+ * @brief UART initialization
  * 
- * @param UartInstancePtr 串口实例
- * @param UartFormat 串口通信格式
- * @param UartDeviceId 串口 ID 号
+ * @param UartInstancePtr UART instance
+ * @param UartFormat UART communication format
+ * @param UartDeviceId UART device ID
  * @return int 
  */
-int UartInit(XUartPs* UartInstancePtr, XUartPsFormat* UartFormat, uint16_t UartDeviceId)
+int UartPsInit(XUartPs* UartInstancePtr, XUartPsFormat* UartFormat, uint16_t UartDeviceId)
 {
     int Status;
     XUartPs_Config *UartConfigPtr;
@@ -44,15 +46,15 @@ int UartInit(XUartPs* UartInstancePtr, XUartPsFormat* UartFormat, uint16_t UartD
 }
 
 /**
- * @brief 串口中断初始化
+ * @brief Initialization of the UART interrupt
  * 
- * @param IntcInstancePtr 中断实例
- * @param UartInstancePtr 串口中断实例
- * @param UartIntrId 串口中断 ID 号
- * @param CallBack 中断服务函数
+ * @param IntcInstancePtr Interrupt instance
+ * @param UartInstancePtr UART interrupt instance
+ * @param UartIntrId UART interrupt ID
+ * @param CallBack Interrupt service function
  * @return int 
  */
-int UartIntrInit(XScuGic *IntcInstancePtr,	XUartPs *UartInstancePtr, 
+int UartPsIntrInit(XScuGic *IntcInstancePtr, XUartPs *UartInstancePtr,
         uint32_t UartIntrId, void(* CallBack)(void *))
 {
     int Status;
@@ -88,7 +90,7 @@ int UartIntrInit(XScuGic *IntcInstancePtr,	XUartPs *UartInstancePtr,
 
     /*Set receiver FIFO interrupt trigger level, here set to 1*/
     XUartPs_SetFifoThreshold(UartInstancePtr, 1);
-    /* 设置中断触发类型 */
+    /* Set the interrupt triggering type */
     XUartPs_SetInterruptMask(UartInstancePtr, 
                         XUARTPS_IXR_RXOVR | XUARTPS_IXR_RXEMPTY | XUARTPS_IXR_TOUT);
     XScuGic_Enable(IntcInstancePtr, UartIntrId);
@@ -97,12 +99,12 @@ int UartIntrInit(XScuGic *IntcInstancePtr,	XUartPs *UartInstancePtr,
 }
 
 /**
- * @brief 串口数据发送函数
+ * @brief UART send function
  * 
- * @param InstancePtr 串口实例
- * @param BufferPtr 发送缓冲区指针
- * @param NumBytes 要发送的字节数
- * @return int 成功发送的字节数
+ * @param InstancePtr UART instance
+ * @param BufferPtr Send buffer pointer
+ * @param NumBytes The number of bytes to send
+ * @return int The number of bytes successfully sent
  */
 int UartPsSend(XUartPs *InstancePtr, uint8_t *BufferPtr, uint32_t NumBytes)
 {
@@ -137,12 +139,12 @@ int UartPsSend(XUartPs *InstancePtr, uint8_t *BufferPtr, uint32_t NumBytes)
 }
 
 /**
- * @brief 串口数据接收函数
+ * @brief UART receive function
  * 
- * @param InstancePtr 串口实例
- * @param BufferPtr 接收缓冲区指针
- * @param NumBytes 要读取的字节数
- * @return int 成功读取的字节数
+ * @param InstancePtr UART instance
+ * @param BufferPtr Receive buffer pointer
+ * @param NumBytes The number of bytes to read
+ * @return int The number of bytes successfully read
  */
 int UartPsRev(XUartPs *InstancePtr, uint8_t *BufferPtr, uint32_t NumBytes)
 {
@@ -190,13 +192,13 @@ int UartPsRev(XUartPs *InstancePtr, uint8_t *BufferPtr, uint32_t NumBytes)
 }
 
 /**
- * @brief 串口波特率更改
+ * @brief Set the UART baud rate
  * 
- * @param UartDeviceId 串口 ID 号
- * @param Baudrate 要设置的波特率
+ * @param UartDeviceId UART device ID
+ * @param Baudrate Baud rate to set
  * @return int 
  */
-int UartSetBaudRate(uint16_t UartDeviceId , uint32_t Baudrate)
+int UartPsSetBaudRate(uint16_t UartDeviceId , uint32_t Baudrate)
 {
     static XUartPs Uart;
     XUartPs_Config *UartConfigPtr;
@@ -208,3 +210,4 @@ int UartSetBaudRate(uint16_t UartDeviceId , uint32_t Baudrate)
     XUartPs_SetBaudRate(&Uart, Baudrate);
     return XST_FAILURE;
 }
+#endif
