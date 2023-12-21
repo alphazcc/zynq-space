@@ -11,3 +11,5 @@
 |  timer  |  私有定时器   |
 |  uart   |     UART      |
 | xptintf | 重定向 UART1  |
+|   sd    |    sd card    |
+|  xadc   |      xadc     |

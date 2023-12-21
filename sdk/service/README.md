@@ -7,3 +7,5 @@
 | network | TCP By LWIP |
 |  timer  | 私有定时器  |
 |  uart   |    UART     |
+|   sd    |   sd card   |
+|  xadc   |     xadc    |
