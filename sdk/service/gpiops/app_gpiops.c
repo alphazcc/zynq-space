@@ -45,31 +45,28 @@ static void gpio_pin_handler(void *CallBackRef)
 {
     XGpioPs *GpioInstancePtr = (XGpioPs *)CallBackRef;
 
-    static int i = 0;
-    xil_printf("interrupt! count : %d \r\n", i++);
-
-    if(XGpioPs_IntrGetStatusPin(GpioInstancePtr, KEY1))
+    if(XGpioPs_IntrGetStatusPin(GpioInstancePtr, KEY4_PIN))
     {
+        xil_printf("KEY4 Press! \r\n");
         intr_flag = 1;
-        XGpioPs_IntrDisablePin(GpioInstancePtr, KEY1);
+        XGpioPs_IntrDisablePin(GpioInstancePtr, KEY4_PIN);
     }
 }
 #endif
 
 void gpiops_function_always(void)
 {
+    static int count = 0;
     static int led_status = 0;
+    static int intr_led_status = 0;
 
     if(intr_flag)
     {
         usleep(20000);
-        if(gpiops_read(KEY1) == 0)
+        if(gpiops_read(KEY4_PIN) == 0)
         {
-            led_status = ~led_status;
-            gpiops_write(LED1, led_status);
-            gpiops_write(LED2, led_status);
-            gpiops_write(LED3, led_status);
-            gpiops_write(LED4, led_status);
+            intr_led_status = ~intr_led_status;
+            gpiops_write(LED4_PIN, intr_led_status);
         }
         intr_flag = 0;
 
@@ -79,9 +76,17 @@ void gpiops_function_always(void)
 #endif
 
 #ifdef USING_PIN_INTR
-        XGpioPs_IntrClearPin(&GpioPs, KEY1);
-        XGpioPs_IntrEnablePin(&GpioPs, KEY1);
+        XGpioPs_IntrClearPin(&GpioPs, KEY4_PIN);
+        XGpioPs_IntrEnablePin(&GpioPs, KEY4_PIN);
 #endif
+    }
+
+    usleep(20000);
+    if(count++ == 10)
+    {
+        count = 0;
+        led_status = ~led_status;
+        gpiops_write(LED2_PIN, led_status);
     }
 }
 
@@ -102,7 +107,7 @@ int app_gpiops_init(void)
 
 #ifdef USING_PIN_INTR
      GpioPsIntrInitPin(&IntcInstPtr, &GpioPs, GPIO_IRPT_INTR, gpio_pin_handler,
-                 KEY1, XGPIOPS_IRQ_TYPE_EDGE_FALLING);
+             KEY4_PIN, XGPIOPS_IRQ_TYPE_EDGE_FALLING);
 #endif
 
     return status;

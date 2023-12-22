@@ -21,13 +21,13 @@ int xadc_read_data(void)
 {
     XadcPs_GetData(&Xadc, &xadc_data);
 
-    kprintf("Temperature:           %f C    \r\n", xadc_data.temp);
-    kprintf("PL kernel voltage:     %f V    \r\n", xadc_data.vccint);
-    kprintf("PL auxiliary voltage:  %f V    \r\n", xadc_data.vccaux);
-    kprintf("PL BRAM voltage:       %f V    \r\n", xadc_data.vccbram);
-    kprintf("PS kernel voltage:     %f V    \r\n", xadc_data.vccpint);
-    kprintf("PS auxiliary voltage:  %f V    \r\n", xadc_data.vccpaux);
-    kprintf("PS DDR voltage:        %f V    \r\n", xadc_data.vccpdro);
+    kprintf("On Chip Temperature:  %f C    \r\n", xadc_data.temp);
+    kprintf("PL Kernel Voltage:     %f V    \r\n", xadc_data.vccint);
+    kprintf("PL Auxiliary Voltage:  %f V    \r\n", xadc_data.vccaux);
+    kprintf("PL BRAM Voltage:       %f V    \r\n", xadc_data.vccbram);
+    kprintf("PS Kernel Voltage:     %f V    \r\n", xadc_data.vccpint);
+    kprintf("PS Auxiliary Voltage:  %f V    \r\n", xadc_data.vccpaux);
+    kprintf("PS DDR Voltage:        %f V    \r\n", xadc_data.vccpdro);
 
     return 0;
 }

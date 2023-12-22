@@ -24,16 +24,16 @@
 #define GPIOPS_BANK	XGPIOPS_BANK2
 #endif
 
-enum UserGpioPs
+enum EMIO_PIN
 {
-    LED1 = 54,
-    LED2,
-    LED3,
-    LED4,
-    KEY1,
-    KEY2,
-    KEY3,
-    KEY4,
+    LED1_PIN = 54,
+    LED2_PIN,
+    LED3_PIN,
+    LED4_PIN,
+    KEY1_PIN,
+    KEY2_PIN,
+    KEY3_PIN,
+    KEY4_PIN,
 };
 
 XGpioPs GpioPs;
