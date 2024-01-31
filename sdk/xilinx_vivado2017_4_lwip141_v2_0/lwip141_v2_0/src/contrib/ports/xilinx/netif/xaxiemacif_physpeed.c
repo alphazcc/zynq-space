@@ -144,6 +144,15 @@
 #define MICREL_PHY_IDENTIFIER                   0x22
 #define MICREL_PHY_KSZ9031_MODEL				0x220
 
+#define JLSEMI_IDENTIFIER 0x937C
+#define JLSEMI_PHY_SELECT_REG_OFFSET 0x1F
+#define JLSEMI_PHY_SPECIFIC_STATUS_REG_OFFSET 0x1A
+#define JLSEMI_PHY_SPECIFIC_PAGE 0xA43
+#define JLSEMI_PHY_LCR_PAGE 0xD04
+#define JLSEMI_PHY_LED_BLINK_PAGE 0x1000
+#define JLSEMI_PHY_LED_CONTROL_REG_OFFSET 0x10
+#define JLSEMI_PHY_LED_BLINK_REG_OFFSET 0x14
+
 #define TI_PHY_REGCR			0xD
 #define TI_PHY_ADDDR			0xE
 #define TI_PHY_PHYCTRL			0x10
@@ -688,6 +697,93 @@ unsigned int get_phy_speed_ksz9031(XAxiEthernet *xaxiemacp, u32 phy_addr)
 		return 0;
 }
 
+static u32_t get_phy_speed_JL2121(XAxiEthernet *xaxiemacp, u32_t phy_addr)
+{
+	u16_t temp;
+	u16_t control;
+	u16_t status;
+	u16_t status_speed;
+	u32_t timeout_counter = 0;
+	u32_t temp_speed;
+	u32_t phyregtemp;
+
+	xil_printf("phy is JL2121!\r\n");
+
+	xil_printf("Start PHY autonegotiation \r\n");
+
+	XAxiEthernet_PhyRead(xaxiemacp, phy_addr, IEEE_CONTROL_REG_OFFSET, &control);
+	control |= IEEE_CTRL_RESET_MASK;
+	XAxiEthernet_PhyWrite(xaxiemacp, phy_addr, IEEE_CONTROL_REG_OFFSET, control);
+
+	usleep(10000);
+
+	XAxiEthernet_PhyRead(xaxiemacp, phy_addr, IEEE_AUTONEGO_ADVERTISE_REG, &control);
+	control |= IEEE_ASYMMETRIC_PAUSE_MASK;
+	control |= IEEE_PAUSE_MASK;
+	control |= ADVERTISE_100;
+	control |= ADVERTISE_10;
+	XAxiEthernet_PhyWrite(xaxiemacp, phy_addr, IEEE_AUTONEGO_ADVERTISE_REG, control);
+
+	XAxiEthernet_PhyRead(xaxiemacp, phy_addr, IEEE_1000_ADVERTISE_REG_OFFSET,
+						 &control);
+	control |= ADVERTISE_1000;
+	XAxiEthernet_PhyWrite(xaxiemacp, phy_addr, IEEE_1000_ADVERTISE_REG_OFFSET,
+						  control);
+
+	XAxiEthernet_PhyRead(xaxiemacp, phy_addr, IEEE_CONTROL_REG_OFFSET, &control);
+	control |= IEEE_CTRL_AUTONEGOTIATE_ENABLE;
+	control |= IEEE_STAT_AUTONEGOTIATE_RESTART;
+	XAxiEthernet_PhyWrite(xaxiemacp, phy_addr, IEEE_CONTROL_REG_OFFSET, control);
+
+	while (1)
+	{
+		XAxiEthernet_PhyRead(xaxiemacp, phy_addr, IEEE_CONTROL_REG_OFFSET, &control);
+		if (control & IEEE_CTRL_RESET_MASK)
+			continue;
+		else
+			break;
+	}
+
+	XAxiEthernet_PhyRead(xaxiemacp, phy_addr, IEEE_STATUS_REG_OFFSET, &status);
+
+	xil_printf("Waiting for PHY to complete autonegotiation.\r\n");
+
+	while (!(status & IEEE_STAT_AUTONEGOTIATE_COMPLETE))
+	{
+		sleep(1);
+
+		timeout_counter++;
+
+		if (timeout_counter == 30)
+		{
+			xil_printf("Auto negotiation error \r\n");
+			return;
+		}
+		XAxiEthernet_PhyRead(xaxiemacp, phy_addr, IEEE_STATUS_REG_OFFSET, &status);
+	}
+	xil_printf("autonegotiation complete \r\n");
+
+	XAxiEthernet_PhyWrite(xaxiemacp, phy_addr, JLSEMI_PHY_SELECT_REG_OFFSET, JLSEMI_PHY_SPECIFIC_PAGE);
+	XAxiEthernet_PhyRead(xaxiemacp, phy_addr, JLSEMI_PHY_SPECIFIC_STATUS_REG_OFFSET, &status_speed);
+
+	XAxiEthernet_PhyWrite(xaxiemacp, phy_addr, JLSEMI_PHY_SELECT_REG_OFFSET, JLSEMI_PHY_LCR_PAGE);
+	XAxiEthernet_PhyWrite(xaxiemacp, phy_addr, JLSEMI_PHY_LED_CONTROL_REG_OFFSET, 0xAE01);
+
+	XAxiEthernet_PhyWrite(xaxiemacp, phy_addr, JLSEMI_PHY_SELECT_REG_OFFSET, JLSEMI_PHY_LED_BLINK_PAGE);
+	XAxiEthernet_PhyWrite(xaxiemacp, phy_addr, JLSEMI_PHY_LED_BLINK_REG_OFFSET, 0x0704);
+	XAxiEthernet_PhyWrite(xaxiemacp, phy_addr, JLSEMI_PHY_SELECT_REG_OFFSET, 0);
+
+	if ((status_speed & 0x20) == 0x20) /* 1000Mbps */
+		return 1000;
+	else if ((status_speed & 0x10) == 0x10) /* 100Mbps */
+		return 100;
+	else if ((status_speed & 0x30) == 0x0) /* 10Mbps */
+		return 10;
+	else
+		return 0;
+	return XST_SUCCESS;
+}
+
 unsigned get_IEEE_phy_speed(XAxiEthernet *xaxiemacp)
 {
 	u16 phy_identifier;
@@ -727,6 +823,10 @@ unsigned get_IEEE_phy_speed(XAxiEthernet *xaxiemacp)
 	{
 		xil_printf("Phy %d is KSZ9031\n\r", phy_addr);
 		return get_phy_speed_ksz9031(xaxiemacp, phy_addr);
+	}
+	else if (phy_identifier == JLSEMI_IDENTIFIER)
+	{
+		return get_phy_speed_JL2121(xaxiemacp, phy_addr);
 	}
 	else {
 	    LWIP_DEBUGF(NETIF_DEBUG, ("XAxiEthernet get_IEEE_phy_speed: Detected PHY with unknown identifier/model.\r\n"));
