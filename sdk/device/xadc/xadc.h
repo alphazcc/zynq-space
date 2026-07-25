@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2022-2023，HelloAlpha
- * 
+ * Copyright (c) 2022-2026, HelloAlpha
+ *
  * Change Logs:
  * Date           Author       Notes
  */
@@ -13,17 +13,17 @@
 #include "xparameters.h"
 #include "xadcps.h"
 
-#define XADC_DEVICE_ID	XPAR_XADCPS_0_DEVICE_ID
+#define XADC_DEVICE_ID XPAR_XADCPS_0_DEVICE_ID
 
 struct Xadc_Data
 {
-    float temp;     // Temperature
-    float vccint;   // PL kernel voltage
-    float vccaux;   // PL auxiliary voltage
-    float vccbram;  // PL BRAM voltage
-    float vccpint;  // PS kernel voltage
-    float vccpaux;  // PS auxiliary voltage
-    float vccpdro;  // PS DDR voltage
+    float temp;    // Temperature
+    float vccint;  // PL kernel voltage
+    float vccaux;  // PL auxiliary voltage
+    float vccbram; // PL BRAM voltage
+    float vccpint; // PS kernel voltage
+    float vccpaux; // PS auxiliary voltage
+    float vccpdro; // PS DDR voltage
 
     uint16_t raw_temp;
     uint16_t raw_vccint;

@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2022-2023，HelloAlpha
- * 
+ * Copyright (c) 2022-2026, HelloAlpha
+ *
  * Change Logs:
  * Date           Author       Notes
  */
@@ -13,18 +13,19 @@ int XadcPs_Init(XAdcPs *XadcInstancePtr, uint16_t DeviceId)
     XAdcPs_Config *XadcConfigPtr;
 
     XadcConfigPtr = XAdcPs_LookupConfig(DeviceId);
-    if (NULL == XadcConfigPtr) {
+    if (NULL == XadcConfigPtr)
+    {
         return XST_FAILURE;
     }
 
-    Status = XAdcPs_CfgInitialize(XadcInstancePtr, XadcConfigPtr, 
-                        XadcConfigPtr->BaseAddress);
-    if (Status != XST_SUCCESS) {
+    Status = XAdcPs_CfgInitialize(XadcInstancePtr, XadcConfigPtr,
+                                  XadcConfigPtr->BaseAddress);
+    if (Status != XST_SUCCESS)
+    {
         return XST_FAILURE;
     }
 
     XAdcPs_SetSequencerMode(XadcInstancePtr, XADCPS_SEQ_MODE_SAFE);
-
     return Status;
 }
 

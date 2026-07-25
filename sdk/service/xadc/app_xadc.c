@@ -1,18 +1,18 @@
 /**
- * Copyright (c) 2022-2023，HelloAlpha
- * 
+ * Copyright (c) 2022-2026, HelloAlpha
+ *
  * Change Logs:
  * Date           Author       Notes
  */
 #include "xadc.h"
 
 #ifdef USING_XADC
-#include "stdio.h"
-#define kprintf printf
 
 /**
  * xil_printf does not support printing floating point numbers
-*/
+ */
+#include "stdio.h"
+#define kprintf printf
 
 static XAdcPs Xadc;
 static XadcData_t xadc_data;
@@ -21,7 +21,7 @@ int xadc_read_data(void)
 {
     XadcPs_GetData(&Xadc, &xadc_data);
 
-    kprintf("On Chip Temperature:  %f C    \r\n", xadc_data.temp);
+    kprintf("On Chip Temperature:   %f C    \r\n", xadc_data.temp);
     kprintf("PL Kernel Voltage:     %f V    \r\n", xadc_data.vccint);
     kprintf("PL Auxiliary Voltage:  %f V    \r\n", xadc_data.vccaux);
     kprintf("PL BRAM Voltage:       %f V    \r\n", xadc_data.vccbram);
@@ -36,7 +36,8 @@ int app_xadc_init(void)
 {
     int Status = XST_SUCCESS;
     Status = XadcPs_Init(&Xadc, XADC_DEVICE_ID);
-    if (Status != XST_SUCCESS) {
+    if (Status != XST_SUCCESS)
+    {
         return XST_FAILURE;
     }
 
