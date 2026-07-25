@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2022-2023，HelloAlpha
- * 
+ * Copyright (c) 2022-2026, HelloAlpha
+ *
  * Change Logs:
  * Date           Author       Notes
  */
@@ -10,35 +10,38 @@
 
 /**
  * @brief UART initialization
- * 
+ *
  * @param UartInstancePtr UART instance
  * @param UartFormat UART communication format
  * @param UartDeviceId UART device ID
- * @return int 
+ * @return int
  */
-int UartPsInit(XUartPs* UartInstancePtr, XUartPsFormat* UartFormat, uint16_t UartDeviceId)
+int UartPsInit(XUartPs *UartInstancePtr, XUartPsFormat *UartFormat, uint16_t UartDeviceId)
 {
     int Status;
     XUartPs_Config *UartConfigPtr;
 
     UartConfigPtr = XUartPs_LookupConfig(UartDeviceId);
-    if (NULL == UartConfigPtr) {
+    if (NULL == UartConfigPtr)
+    {
         return XST_FAILURE;
     }
 
-    Status = XUartPs_CfgInitialize(UartInstancePtr, UartConfigPtr, 
-                        UartConfigPtr->BaseAddress);
-    if (Status != XST_SUCCESS) {
+    Status = XUartPs_CfgInitialize(UartInstancePtr, UartConfigPtr,
+                                   UartConfigPtr->BaseAddress);
+    if (Status != XST_SUCCESS)
+    {
         return XST_FAILURE;
     }
 
     Status = XUartPs_SelfTest(UartInstancePtr);
-    if (Status != XST_SUCCESS) {
+    if (Status != XST_SUCCESS)
+    {
         return XST_FAILURE;
     }
 
     /* Set UART mode Baud Rate 115200, 8bits, no parity, 1 stop bit */
-    XUartPs_SetDataFormat(UartInstancePtr, UartFormat) ;
+    XUartPs_SetDataFormat(UartInstancePtr, UartFormat);
     /* Set the UART in Normal Mode */
     XUartPs_SetOperMode(UartInstancePtr, XUARTPS_OPER_MODE_NORMAL);
 
@@ -47,41 +50,44 @@ int UartPsInit(XUartPs* UartInstancePtr, XUartPsFormat* UartFormat, uint16_t Uar
 
 /**
  * @brief Initialization of the UART interrupt
- * 
+ *
  * @param IntcInstancePtr Interrupt instance
  * @param UartInstancePtr UART interrupt instance
  * @param UartIntrId UART interrupt ID
  * @param CallBack Interrupt service function
- * @return int 
+ * @return int
  */
 int UartPsIntrInit(XScuGic *IntcInstancePtr, XUartPs *UartInstancePtr,
-        uint32_t UartIntrId, void(* CallBack)(void *))
+                   uint32_t UartIntrId, void (*CallBack)(void *))
 {
     int Status;
 
     XScuGic_Config *IntcConfig;
 
     IntcConfig = XScuGic_LookupConfig(INTC_DEVICE_ID);
-    if (NULL == IntcConfig) {
+    if (NULL == IntcConfig)
+    {
         return XST_FAILURE;
     }
 
     Status = XScuGic_CfgInitialize(IntcInstancePtr, IntcConfig,
-            IntcConfig->CpuBaseAddress);
-    if (Status != XST_SUCCESS) {
+                                   IntcConfig->CpuBaseAddress);
+    if (Status != XST_SUCCESS)
+    {
         return XST_FAILURE;
     }
 
     Xil_ExceptionInit();
     Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT,
-            (Xil_ExceptionHandler) XScuGic_InterruptHandler,
-            IntcInstancePtr);
+                                 (Xil_ExceptionHandler)XScuGic_InterruptHandler,
+                                 IntcInstancePtr);
     Xil_ExceptionEnable();
 
     Status = XScuGic_Connect(IntcInstancePtr, UartIntrId,
-            (Xil_ExceptionHandler) CallBack,
-            (void *) UartInstancePtr);
-    if (Status != XST_SUCCESS) {
+                             (Xil_ExceptionHandler)CallBack,
+                             (void *)UartInstancePtr);
+    if (Status != XST_SUCCESS)
+    {
         return XST_FAILURE;
     }
 
@@ -91,16 +97,16 @@ int UartPsIntrInit(XScuGic *IntcInstancePtr, XUartPs *UartInstancePtr,
     /*Set receiver FIFO interrupt trigger level, here set to 1*/
     XUartPs_SetFifoThreshold(UartInstancePtr, 1);
     /* Set the interrupt triggering type */
-    XUartPs_SetInterruptMask(UartInstancePtr, 
-                        XUARTPS_IXR_RXOVR | XUARTPS_IXR_RXEMPTY | XUARTPS_IXR_TOUT);
+    XUartPs_SetInterruptMask(UartInstancePtr,
+                             XUARTPS_IXR_RXOVR | XUARTPS_IXR_RXEMPTY | XUARTPS_IXR_TOUT);
     XScuGic_Enable(IntcInstancePtr, UartIntrId);
 
-    return Status ;
+    return Status;
 }
 
 /**
  * @brief UART send function
- * 
+ *
  * @param InstancePtr UART instance
  * @param BufferPtr Send buffer pointer
  * @param NumBytes The number of bytes to send
@@ -115,16 +121,14 @@ int UartPsSend(XUartPs *InstancePtr, uint8_t *BufferPtr, uint32_t NumBytes)
     InstancePtr->SendBuffer.RemainingBytes = NumBytes;
     InstancePtr->SendBuffer.NextBytePtr = BufferPtr;
 
-
     while (InstancePtr->SendBuffer.RemainingBytes > SentCount)
     {
         /* Fill the FIFO from the buffer */
         if (!XUartPs_IsTransmitFull(InstancePtr->Config.BaseAddress))
         {
             XUartPs_WriteReg(InstancePtr->Config.BaseAddress,
-                    XUARTPS_FIFO_OFFSET,
-                    ((uint32_t)InstancePtr->SendBuffer.
-                            NextBytePtr[SentCount]));
+                             XUARTPS_FIFO_OFFSET,
+                             ((uint32_t)InstancePtr->SendBuffer.NextBytePtr[SentCount]));
 
             /* Increment the send count. */
             SentCount++;
@@ -140,7 +144,7 @@ int UartPsSend(XUartPs *InstancePtr, uint8_t *BufferPtr, uint32_t NumBytes)
 
 /**
  * @brief UART receive function
- * 
+ *
  * @param InstancePtr UART instance
  * @param BufferPtr Receive buffer pointer
  * @param NumBytes The number of bytes to read
@@ -161,29 +165,30 @@ int UartPsRev(XUartPs *InstancePtr, uint8_t *BufferPtr, uint32_t NumBytes)
      * the RX FIFO
      */
     CsrRegister = XUartPs_ReadReg(InstancePtr->Config.BaseAddress,
-            XUARTPS_SR_OFFSET);
+                                  XUARTPS_SR_OFFSET);
 
     /*
      * Loop until there is no more data in RX FIFO or the specified
      * number of bytes has been received
      */
-    while((ReceivedCount < InstancePtr->ReceiveBuffer.RemainingBytes)&&
-            (((CsrRegister & XUARTPS_SR_RXEMPTY) == (u32)0)))
+    while ((ReceivedCount < InstancePtr->ReceiveBuffer.RemainingBytes) &&
+           (((CsrRegister & XUARTPS_SR_RXEMPTY) == (u32)0)))
     {
         InstancePtr->ReceiveBuffer.NextBytePtr[ReceivedCount] =
-                XUartPs_ReadReg(InstancePtr->Config.BaseAddress, XUARTPS_FIFO_OFFSET);
+            XUartPs_ReadReg(InstancePtr->Config.BaseAddress, XUARTPS_FIFO_OFFSET);
 
         ReceivedCount++;
 
         CsrRegister = XUartPs_ReadReg(InstancePtr->Config.BaseAddress,
-                XUARTPS_SR_OFFSET);
+                                      XUARTPS_SR_OFFSET);
     }
     InstancePtr->is_rxbs_error = 0;
     /*
      * Update the receive buffer to reflect the number of bytes just
      * received
      */
-    if(NULL != InstancePtr->ReceiveBuffer.NextBytePtr){
+    if (NULL != InstancePtr->ReceiveBuffer.NextBytePtr)
+    {
         InstancePtr->ReceiveBuffer.NextBytePtr += ReceivedCount;
     }
     InstancePtr->ReceiveBuffer.RemainingBytes -= ReceivedCount;
@@ -193,17 +198,18 @@ int UartPsRev(XUartPs *InstancePtr, uint8_t *BufferPtr, uint32_t NumBytes)
 
 /**
  * @brief Set the UART baud rate
- * 
+ *
  * @param UartDeviceId UART device ID
  * @param Baudrate Baud rate to set
- * @return int 
+ * @return int
  */
-int UartPsSetBaudRate(uint16_t UartDeviceId , uint32_t Baudrate)
+int UartPsSetBaudRate(uint16_t UartDeviceId, uint32_t Baudrate)
 {
     static XUartPs Uart;
     XUartPs_Config *UartConfigPtr;
     UartConfigPtr = XUartPs_LookupConfig(UartDeviceId);
-    if (NULL == UartConfigPtr) {
+    if (NULL == UartConfigPtr)
+    {
         return XST_FAILURE;
     }
     XUartPs_CfgInitialize(&Uart, UartConfigPtr, UartConfigPtr->BaseAddress);

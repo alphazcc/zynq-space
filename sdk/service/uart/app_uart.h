@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2022-2023，HelloAlpha
- * 
+ * Copyright (c) 2022-2026, HelloAlpha
+ *
  * Change Logs:
  * Date           Author       Notes
  */
@@ -12,34 +12,22 @@
 #ifdef USING_UART
 
 /* maximum receiver length */
-#define UART_MSG_MAX_LEN    100
-
-struct uart_msg 
-{
-    uint8_t ReceivedBuffer[UART_MSG_MAX_LEN];
-    uint8_t *ReceivedBufferPtr;
-    uint32_t ReceivedByteNum;
-    char ReceivedFlag;
-    uint8_t SendBuffer[UART_MSG_MAX_LEN];
-    uint8_t *SendBufferPtr;
-    uint32_t SendByteNum;
-};
-
-typedef struct uart_msg uart_msg_t;
+#define UART_MSG_MAX_LEN 100
 
 #ifdef USING_UART0
-XUartPs Uart0_Ps;
-uart_msg_t g_uart0_msg;
+#define UART0_BAUDRATE 115200U
 #endif
 
 #ifdef USING_UART1
-XUartPs Uart1_Ps;
-uart_msg_t g_uart1_msg;
+#define UART1_BAUDRATE 115200U
 #endif
 
+int Uart0_RECV(uint8_t *RECVData, uint32_t DataLength);
+int Uart1_RECV(uint8_t *RECVData, uint32_t DataLength);
+int Uart0_Send(uint8_t *SendData, uint32_t DataLength);
+int Uart1_Send(uint8_t *SendData, uint32_t DataLength);
+
 int app_uart_init(void);
-int uart_msg_print(void);
-int uart_lookback_test(void);
 
 #endif
 #endif
