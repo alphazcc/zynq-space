@@ -13,4 +13,12 @@
 #endif
 /**@}*/
 
+/**
+ * SD CARD config begin
+ * @{
+ */
+#define USING_SD_CARD
+#define USING_SD_CARD_TEST
+/**@}*/
+
 #endif
