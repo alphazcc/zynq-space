@@ -1,7 +1,7 @@
 #ifndef __APP_SD_H__
 #define __APP_SD_H__
 
-#include "sd/sd_card.h"
+#include "sd_card.h"
 
 #ifdef USING_SD_CARD
 
